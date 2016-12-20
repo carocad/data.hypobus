@@ -133,7 +133,6 @@
           (System/gc)
           (Thread/sleep 1000)))))
 
-
 ;; (defonce trajectories (sim/organize-journey
 ;;                         (sim/fetch-journeys
 ;;                           "resources/dublin/siri.20130116.csv"
