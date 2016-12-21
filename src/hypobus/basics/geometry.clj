@@ -24,14 +24,11 @@
                  (Math/cos lat-1)))]
     (* RADIOUS 2 (Math/asin (Math/sqrt h)))))
 
-(require '[proto-repl.saved-values :as proto])
-
 (defn haversine
   "Compute the great-circle distance between two points on Earth given their
   longitude and latitude in DEGREES. The distance is computed in meters
   by default. This function takes two hash-maps as argument with keys :lat :lon"
   [p1 p2]
-  (proto/save 3)
   (rad-haversine (Math/toRadians (:lat p1)) (Math/toRadians (:lon p1))
                  (Math/toRadians (:lat p2)) (Math/toRadians (:lon p2))))
 
