@@ -1,11 +1,6 @@
 (ns hypobus.conjectures.hypo
-  (:require [clojure.data :refer [diff]]
-            [clojure.core.reducers :as red]
-            [clojure.core.matrix.stats :as stats]
+  (:require [clojure.core.matrix.stats :as stats]
             [hypobus.utils.tool :as tool]
-            [hypobus.utils.mapbox :as mapbox]
-            [hypobus.basics.geometry :as geo]
-            ;[hypobus.visuals.plotter :as plotter]
             [hypobus.conjectures.route :as route]))
 
 ; ================== NOT NAMESPACED YET ====================;
