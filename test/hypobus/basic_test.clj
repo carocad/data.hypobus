@@ -27,6 +27,7 @@
 (def burst-curves (sim/add-burst burst-noise (last noisy-curves)))
 (def traces (shuffle (concat (butlast noisy-curves) spam-curves (vector burst-curves))))
 
+;; TODO: make a real test using the test data
 ; (def foo (hypo/recombine traces))
 ; (map (fn [curve] (frechet/frechet-dist (map #(apply geo/point %) connatra-trace)
 ;                                        curve
