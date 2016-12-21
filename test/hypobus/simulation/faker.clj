@@ -1,4 +1,4 @@
-(ns hypobus.conjectures.simulation.faker
+(ns hypobus.simulation.faker
   "functions used to create fake curves"
   (:import [java.util Random])
   (:require [hypobus.utils.tool :as tool]

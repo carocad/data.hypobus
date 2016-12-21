@@ -1,6 +1,6 @@
-(ns hypobus.conjectures.simulation.test-data
+(ns hypobus.simulation.test-data
   (:require [frechet-dist.sampler  :as sampler]
-            [hypobus.conjectures.simulation.faker :as sim]
+            [hypobus.simulation.faker :as sim]
             [hypobus.basics.geometry :as geo]))
 
 ;******************************* TESTS *******************************;
