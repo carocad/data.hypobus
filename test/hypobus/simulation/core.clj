@@ -2,9 +2,9 @@
   (:require [clojure.core.reducers :as red]
             [hypobus.utils.mapbox :as mapbox]
             [hypobus.basics.geometry :as geo]
-            [hypobus.conjectures.hypo :as hypo]
-            ;[hypobus.visuals.plotter :as plotter]
-            [hypobus.simulation.data-handler :as sim]))
+            [hypobus.conjectures.core :as hypo]
+            [hypobus.simulation.data-handler :as sim]
+            [hypobus.simulation.visuals.plotter :as plotter]))
 
 ;; HACKING private vars into ns public ones
 (def remove-outliers #'hypo/remove-outliers)

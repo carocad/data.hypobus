@@ -1,4 +1,4 @@
-(ns hypobus.conjectures.hypo
+(ns hypobus.conjectures.core
   (:require [clojure.core.matrix.stats :as stats]
             [hypobus.utils.tool :as tool]
             [hypobus.conjectures.route :as route]))
@@ -35,7 +35,7 @@
                   (remove #(> (Math/abs (double (- (:distrust %) dt))) (* 3 sd-dt)) curve))]
     (remove #(> 3 (count %)) ncurves)))
 
-; ================== NORMAL CORE FUNCTIONS ====================;
+; ================== CORE FUNCTIONS ====================;
 
 (defn check-trace
   "compare all the hypothesis with a given trace, if they match they are
@@ -77,14 +77,12 @@
 (defn conjectures
   "takes a sequence of traces and tries to reduce them by merging similar ones
   and keeping unique ones. This function is meant to be used for parallel/batch
-  processing. For online processing prefer check-hypos"
+  processing. For online processing prefer hypothize"
   ([] (vector))
-  ([traces]
-   (if (empty? traces) traces
-     (recombine traces)))
+  ([traces] (recombine traces))
   ([tr1 tr2]
    (let [traces  (concat tr1 tr2)
          rtraces (remove-untrusted traces)]
      (if (= traces rtraces)
-       (conjectures traces)
-       (conjectures (remove-outliers rtraces))))))
+       (recombine traces)
+       (recombine (remove-outliers rtraces))))))
