@@ -58,4 +58,4 @@
  (test/is (= 4 (+ 2 2)))
  (test/is (= 7 (+ 3 4))))
 
-(test/run-tests 'hypobus.basic-test)
+;;(test/run-tests 'hypobus.basic-test)

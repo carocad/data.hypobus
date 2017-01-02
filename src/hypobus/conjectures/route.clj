@@ -5,9 +5,9 @@
             [hypobus.basics.geometry :as geo]))
 
 ; damping factor
-(def ^:private EPSILON 1.0)
+(def EPSILON 1.0)
 ; Maximum value admited to consider two curves similar
-(def ^:private MAX-DISIM (/ 50.0 0.6))
+(def MAX-DISIM (/ 50.0 0.6))
 
 (defn- arch-length
   "computes the partial arch-length as the sum of the point to point distances
@@ -29,6 +29,8 @@
                       (arch-length dQij 0 (last-index Q)))]
     (max percP percQ)))
 
+;; TODO: is it necessary to put the similarity as a value when it can be
+;; a pure function?
 (defn similarity
   "compare two curves P and Q and returns their partial-frechet-distance, their
   partial coupling sequence and whether or not they are similar"

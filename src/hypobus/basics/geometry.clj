@@ -2,13 +2,13 @@
   (:require [frechet-dist.core :refer [partial-frechet-dist]]))
 
 ;; TODO: most of these declarations should be dynamic at some point
-(def ^:private MAX-DISTRUST 1.0)
-(def ^:private MIN-WEIGHT (/ 1 (* 100 100))); 100 meters radious as deviation
-(def ^:private RADIOUS 6372800); radious of the Earth in meters
+(def MAX-DISTRUST 1.0)
+(def MIN-WEIGHT (/ 1 (* 100 100))); 100 meters radious as deviation
+(def RADIOUS 6372800); radious of the Earth in meters
 
-(def ^:private MIN-DIST 30); meters
-(def ^:private MAX-DIST 100); meters
-(def ^:private MAX-GAP  300); meters
+(def MIN-DIST 30); meters
+(def MAX-DIST 100); meters
+(def MAX-GAP  300); meters
 
 
 ;; TODO: Do I really need the type hints here even after I put them
