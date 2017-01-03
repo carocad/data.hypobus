@@ -94,7 +94,7 @@
   ([p1 p2] ;"computes the weighted interpolation of points p1 and p2 according to weights w1 and w2"
    (let [{:keys [weight lat lon distrust]} p1
          {w2 :weight, lat2 :lat, lon2 :lon, dt2 :distrust} p2]
-     (geo/->GeoPoint
+     (geo/->HypoPoint
        (/ (+ (* lat weight) (* lat2 w2)) (+ weight w2))
        (/ (+ (* lon weight) (* lon2 w2)) (+ weight w2))
        (+ weight w2)
