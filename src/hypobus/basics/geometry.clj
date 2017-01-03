@@ -1,5 +1,6 @@
 (ns hypobus.basics.geometry
-  (:require [frechet-dist.core :refer [partial-frechet-dist]]))
+  (:require [frechet-dist.core :as frechet]
+            [hypobus.utils.tool :as tool]))
 
 ;; TODO: most of these declarations should be dynamic at some point
 (def MAX-DISTRUST 1.0)
@@ -10,10 +11,9 @@
 (def MAX-DIST 100); meters
 (def MAX-GAP  300); meters
 
-
 ;; TODO: Do I really need the type hints here even after I put them
 ;;      on the record ?
-(defn- rad-haversine
+(defn- haversine-radians
   "Compute the great-circle distance between two points on Earth given their
   longitude and latitude in RADIANS. The distance is computed in meters
   by default."
@@ -24,20 +24,19 @@
                  (Math/cos lat-1)))]
     (* RADIOUS 2 (Math/asin (Math/sqrt h)))))
 
+(defn haversine-vector
+  "same as haversine but takes two vector points as input."
+  [[lat lon] [lat2 lon2]]
+  (haversine-radians (Math/toRadians lat) (Math/toRadians lon)
+                     (Math/toRadians lat2) (Math/toRadians lon2)))
+
 (defn haversine
   "Compute the great-circle distance between two points on Earth given their
   longitude and latitude in DEGREES. The distance is computed in meters
   by default. This function takes two hash-maps as argument with keys :lat :lon"
   [p1 p2]
-  (rad-haversine (Math/toRadians (:lat p1)) (Math/toRadians (:lon p1))
-                 (Math/toRadians (:lat p2)) (Math/toRadians (:lon p2))))
-
-(defn vhaversine
-  "same as haversine but takes two vector points as input."
-  [[lat lon] [lat2 lon2]]
-  (rad-haversine (Math/toRadians lat) (Math/toRadians lon)
-                 (Math/toRadians lat2) (Math/toRadians lon2)))
-
+  (haversine-radians (Math/toRadians (:lat p1)) (Math/toRadians (:lon p1))
+                     (Math/toRadians (:lat p2)) (Math/toRadians (:lon p2))))
 
 ; (haversine [-86.67 36.12] [-118.40 33.94])
 ;=> 2887.2599506071106
@@ -46,88 +45,77 @@
 ; => 4831.502535634215 nauticals miles
 
 (defprotocol GeoDistance
-  (-dist [object-1 object-2]
-         [object-1 object-2 dist-fn]))
+  (distance [object-1 object-2]
+            [object-1 object-2 dist-fn]))
 
-(defrecord GeoPoint [^double lat
-                     ^double lon
-                     ^double weight
-                     ^double distrust])
+(defrecord HypoPoint [^double lat
+                      ^double lon
+                      ^double weight
+                      ^double distrust])
 
 (extend-type clojure.lang.PersistentArrayMap
   GeoDistance
-  (-dist ([point-1 point-2] (haversine point-1 point-2))
-         ([point-1 point-2 f] (f point-1 point-2))))
+  (distance ([point-1 point-2]   (haversine point-1 point-2))
+            ([point-1 point-2 f] (f point-1 point-2))))
 
-(extend-type GeoPoint
+(extend-type HypoPoint
   GeoDistance
-  (-dist ([point-1 point-2] (haversine point-1 point-2))
-         ([point-1 point-2 f] (f point-1 point-2))))
+  (distance ([point-1 point-2]   (haversine point-1 point-2))
+            ([point-1 point-2 f] (f point-1 point-2))))
 
 (extend-type clojure.lang.Sequential
   GeoDistance
-  (-dist ([coll coll2] (partial-frechet-dist coll coll2 haversine))
-         ([coll coll2 f] (f coll coll2))))
+  (distance ([coll coll2]   (frechet/partial-distance coll coll2 haversine))
+            ([coll coll2 f] (f coll coll2))))
 
-;; TODO: replace :pre conditions with proper spec definitions in Clojure v1.9
-(defn point
-  "create a point record. Two options are allowed; either a hash-map with the
-  required key-vals or a direct lat lon instantiation."
-  ([{lat :lat lon :lon dt :distrust w :weight :or {w MIN-WEIGHT, dt MAX-DISTRUST}}]
-   ;; {:pre  [(and (number? lat) (number? lon))]}
-   (->GeoPoint lat lon w dt))
-  ([lat lon]
-   ;; {:pre  [(and (number? lat) (number? lon))]}
-   (->GeoPoint lat lon MIN-WEIGHT MAX-DISTRUST)))
-
-
-(defn distance
-  "computes the distance between two objects using function f.
-  f defaults to the great-circle distance for points and the partial frechet
-  distance for polygonal lines "
-  ([o1 o2] (-dist o1 o2))
-  ([o1 o2 f] (-dist o1 o2 f)))
-
-(defn split-at-gaps
-  "splits a curve into several ones if the distance between two consecutive
+(defn gaps
+  "returns a reducing function to use with partition-by such that a curve can
+  be partitioned into several onees if the distance between two consecutive
   points is greater than max-gap. f is the function used to calculate the
-  distance between two points in the curve. Returns a list of curves."
-  ([f coll]
-   (split-at-gaps MAX-GAP f coll))
-  ([max-gap f coll]
-   (loop [parts    (transient [])
-          currpart (transient [])
-          tail     coll]
-     (cond
-       (empty? (rest tail)) (persistent! (conj! parts (persistent! (conj! currpart (first tail)))))
-       (> max-gap (f (first tail) (second tail))) (recur parts (conj! currpart (first tail)) (rest tail))
-       :else (recur (conj! parts (persistent! (conj! currpart (first tail)))) (transient []) (rest tail))))))
+  distance between two points in the curve. f defaults to the haversine and
+  max-gap defaults to hypobus.basics.geometry/MAX-GAP"
+  ([]
+   (gaps MAX-GAP haversine))
+  ([max-gap]
+   (gaps max-gap haversine))
+  ([max-gap f]
+   (let [prior (volatile! 1)]
+     (fn [value]
+       (if (> max-gap (f @prior value))
+        (do (vreset! prior value) nil)
+        (vreset! prior value))))))
+;; example
+;; (partition-by (gaps 2 #(Math/abs (- %1 %2))) [2 3 4 7 6 1])
 
 (defn- interpolate
-  "returns n interpolated points between p_i (inclusive) and p_j (exclusive)"
-  [p_i p_j n]
-  (let [deltap (map / (map - p_j p_i) (repeat n))] ; size of each interval
-    (for [a (range n)]
-      (map + p_i (map * deltap (repeat a))))))
+  "returns n interpolated points between mi (inclusive) and mj (exclusive)
+  where mi and mj are both hash-maps with the same shape"
+  [mi mj n]
+  (let [delta (map / (map - (vals mj) (vals mi))
+                     (repeat n))  ; size of each interval
+        pdelta (zipmap (keys mi) delta)]
+    (for [i (range n)]
+      (merge-with + mi (tool/update-vals pdelta #(* % i))))))
+;; example
+;; (interpolate {:a 0 :b 0} {:a 5 :b 5} 3)
 
 (defn tidy
   "tidy up a curve such that the distance between two points is not smaller
   than min-dist and not greater than max-dist. f is the function used to
   calculate the distance between two points in the curve. min-dist and max-dist
-  default to 30 and 100 respectively"
-  ([f coll]
-   (tidy MIN-DIST MAX-DIST f coll))
-  ([min-dist max-dist f coll]
-   (when-not (empty? coll)
-     (let [rawcoll (map #(vector (:lat %) (:lon %)) coll)
-           pij-dist (map f coll (rest coll))
-           judge    (fn [index dist]
-                      (cond
-                        (> dist max-dist) (map #(apply point %) (interpolate (nth rawcoll index)
-                                                                             (nth rawcoll (inc index))
-                                                                             (Math/ceil (/ dist max-dist))))
-                        (< dist min-dist) nil ; prepare for filtering
-                        :else (list (point (nth coll index))))) ; OK point between the limits
-           sampler  (comp (map-indexed judge) (remove nil?) (mapcat identity))
-           new-coll (into [] sampler pij-dist)]
-       (conj new-coll (point (last coll)))))))
+  default to hypobus.basics.geometry/MIN-DIST and hypobus.basics.geometry/MAX-DIST
+  respectively"
+  ([f hypocurve]
+   (tidy MIN-DIST MAX-DIST f hypocurve))
+  ([min-dist max-dist f hypocurve]
+   (let [pij-dist (map f hypocurve (rest hypocurve))
+         judge    (fn [index dist]
+                    (cond
+                      (> dist max-dist) (interpolate (nth hypocurve index)
+                                                     (nth hypocurve (inc index))
+                                                     (Math/ceil (/ dist max-dist)))
+                      (< dist min-dist) nil ; prepare for filtering
+                      :else (list (nth hypocurve index)))) ; OK point between the limits
+         sampler  (comp (map-indexed judge) (remove nil?) (mapcat identity))
+         new-coll (into [] sampler pij-dist)]
+     (conj new-coll (last hypocurve)))))

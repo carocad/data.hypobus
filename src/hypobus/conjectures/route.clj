@@ -1,7 +1,6 @@
 (ns hypobus.conjectures.route
   "functions related to the comparison of two curves, as well as how to merge them"
-  (:require [frechet-dist.core :refer [partial-frechet-dist]]
-            [hypobus.utils.tool :refer [last-index]]
+  (:require [hypobus.utils.tool :as tool]
             [hypobus.basics.geometry :as geo]))
 
 ; damping factor
@@ -24,9 +23,9 @@
         dPij       (mapv geo/distance P (rest P))
         dQij       (mapv geo/distance Q (rest Q))
         percP      (/ (arch-length dPij idx-p jdx-p) ; percentage of A
-                      (arch-length dPij 0 (last-index P)))
+                      (arch-length dPij 0 (tool/last-index P)))
         percQ      (/ (arch-length dQij idx-q jdx-q)
-                      (arch-length dQij 0 (last-index Q)))]
+                      (arch-length dQij 0 (tool/last-index Q)))]
     (max percP percQ)))
 
 ;; TODO: is it necessary to put the similarity as a value when it can be
@@ -76,7 +75,7 @@
   but not on the other are returned as nil"
   [P Q coupling]
   (let [[i_P i_Q]   (first coupling)
-        [j_P j_Q]   (map - [(last-index P) (last-index Q)]
+        [j_P j_Q]   (map - [(tool/last-index P) (tool/last-index Q)]
                            (last coupling))]
     (cond
      ; Q contained in P
