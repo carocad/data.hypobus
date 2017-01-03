@@ -46,7 +46,7 @@
 
 (defn organize-journey
   [data]
-  (let [gap-remover    (mapcat #(geo/split-at-gaps geo/haversine %))
+  (let [gap-remover    (mapcat #(partition-by (geo/gaps)))
         trans-curves   (map #(geo/tidy geo/haversine %))
         remove-fault   (remove #(< (count %) 5))
         prepare-data   (comp gap-remover trans-curves remove-fault)

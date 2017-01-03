@@ -43,10 +43,10 @@ must span"
 (defn- point-noise
   "add gaussian noise with sigma=deviation to a point and return the point with
   an estimate of the weight = 1/sigma^2"
-  [deviation point]
-  (let [new-point (tool/fmap #(+ % (rand-gauss deviation)) point)
-        p-dist    (geo/distance point new-point)]
-    (conj new-point {:weight (/ 1 (* p-dist p-dist))})))
+  [deviation hypopoint]
+  (let [new-point (tool/update-vals hypopoint #(+ % (rand-gauss deviation)))
+        p-dist    (geo/distance hypopoint new-point)]
+    (assoc new-point :weight (/ 1 (* p-dist p-dist)))))
 
 (defn add-noise
   "add gaussian noise with sigma=deviation to all points in a curve. The curve

@@ -24,12 +24,6 @@
                  (Math/cos lat-1)))]
     (* RADIOUS 2 (Math/asin (Math/sqrt h)))))
 
-(defn haversine-vector
-  "same as haversine but takes two vector points as input."
-  [[lat lon] [lat2 lon2]]
-  (haversine-radians (Math/toRadians lat) (Math/toRadians lon)
-                     (Math/toRadians lat2) (Math/toRadians lon2)))
-
 (defn haversine
   "Compute the great-circle distance between two points on Earth given their
   longitude and latitude in DEGREES. The distance is computed in meters
@@ -46,25 +40,28 @@
 
 (defprotocol GeoDistance
   (distance [object-1 object-2]
-            [object-1 object-2 dist-fn]))
+            [object-1 object-2 dist-fn]
+            "computes the distance between two geometric objects (points, curves)"))
 
 (defrecord HypoPoint [^double lat
                       ^double lon
                       ^double weight
                       ^double distrust])
 
-(extend-type clojure.lang.PersistentArrayMap
-  GeoDistance
+(extend-protocol GeoDistance
+  clojure.lang.PersistentArrayMap                           ;; point as hash-map
   (distance ([point-1 point-2]   (haversine point-1 point-2))
-            ([point-1 point-2 f] (f point-1 point-2))))
-
-(extend-type HypoPoint
-  GeoDistance
+            ([point-1 point-2 f] (f point-1 point-2)))
+  HypoPoint                                         ;; point as HypoPoint record
   (distance ([point-1 point-2]   (haversine point-1 point-2))
-            ([point-1 point-2 f] (f point-1 point-2))))
-
-(extend-type clojure.lang.Sequential
-  GeoDistance
+            ([point-1 point-2 f] (f point-1 point-2)))
+  clojure.lang.PersistentVector                        ;; point as lat lon tuple
+  (distance ([[lat lon] [lat2 lon2]]
+             (haversine-radians (Math/toRadians lat) (Math/toRadians lon)
+                                (Math/toRadians lat2) (Math/toRadians lon2)))
+            ([point-1 point-2 f]
+             (f point-1 point-2)))
+  clojure.lang.Sequential                         ;; curve as sequence of points
   (distance ([coll coll2]   (frechet/partial-distance coll coll2 haversine))
             ([coll coll2 f] (f coll coll2))))
 

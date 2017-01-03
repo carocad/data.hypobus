@@ -17,7 +17,7 @@
 (def burst-noise 0.01); degrees. standard deviation of the burst noise
 (def num-vandals 1)
 
-(def coordinates (sampler/refine connatra-trace max-dist geo/vhaversine))
+(def coordinates (sampler/refine connatra-trace max-dist geo/distance))
 (def subcurves (sim/subcurves coordinates num-subcurves min-span))
 (def geo-subcurves (map (fn [s] (map #(zipmap [:lon :lat] %) s))
                         subcurves))
@@ -43,7 +43,7 @@
         burst-noise   0.01; degrees. standard deviation of the burst noise
         num-vandals   1
 
-        coordinates   (sampler/refine connatra-trace max-dist geo/vhaversine)
+        coordinates   (sampler/refine connatra-trace max-dist geo/distance)
         subcurves     (sim/subcurves coordinates num-subcurves min-span)
         geo-subcurves (map (fn [s] (map #(zipmap [:lon :lat] %) s))
                            subcurves)

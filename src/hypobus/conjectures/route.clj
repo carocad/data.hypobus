@@ -103,6 +103,6 @@
    (let [real-coupling (full-coupling P Q coupling)]
      (for [[i j] real-coupling]
        (cond
-         (nil? i) (geo/point (nth Q j)) ; avoid holding on to the previous curve
-         (nil? j) (geo/point (nth P i)) ; avoid holding on to the previous curve
+         (nil? i) (nth Q j)
+         (nil? j) (nth P i)
          :else (fuse (nth P i) (nth Q j)))))))

@@ -14,6 +14,8 @@
 (s/def ::geo-point  (s/keys :req-un [::lat ::lon]))
 (s/def ::hypo-point (s/keys :req-un [::lat ::lon ::weight ::distrust]))
 
+(macroexpand '(s/coll-of ::geo-point  :kind sequential? :min-count 2))
+
 (s/def ::geo-curve  (s/coll-of ::geo-point  :kind sequential? :min-count 2))
 (s/def ::hypo-curve (s/coll-of ::hypo-point :kind sequential? :min-count 2))
 
