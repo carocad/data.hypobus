@@ -1,5 +1,6 @@
 (ns hypobus.conjectures.core
   (:require [clojure.core.matrix.stats :as stats]
+            [frechet-dist.core :as frechet]
             [hypobus.utils.tool :as tool]
             [hypobus.conjectures.route :as route]))
 
@@ -43,16 +44,18 @@
   merged, otherwise they are returned as they are."
   [hypos trace]
   (for [hypo hypos
-        :let [result (route/similarity hypo trace)]]
-    (if-not (:similar? result) hypo
-      (route/fuse hypo trace (:couple result)))))
+        :let [fredis (frechet/partial-distance hypo trace)
+              match  (route/overlap hypo trace (:couple fredis))]]
+    (if-not (> route/MAX-DISIM (/ (:dist fredis) match)) hypo
+      (route/fuse hypo trace (:couple fredis)))))
 
 (defn- with-similar
-  "utility function to use inside recombine"
+  "reducing function. Compare c1 with c2 and stop the reduction if they are similar"
   [_ [c1 c2]]
-  (let [res (route/similarity c1 c2)]
-    (when (:similar? res)
-      (reduced [c1 c2 res]))))
+  (let [fredis (frechet/partial-distance c1 c2)
+        match  (route/overlap c1 c2 (:couple fredis))]
+    (when (> route/MAX-DISIM (/ (:dist fredis) match))
+      (reduced [c1 c2 fredis]))))
 
 (defn recombine
   "takes a sequence of hypotheses and compares them all (all possible combinations).

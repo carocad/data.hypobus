@@ -5,7 +5,7 @@
             :url "https://github.com/carocad/hypobus/blob/master/LICENSE"}
   :dependencies [[org.clojure/clojure "1.9.0-alpha14"]
                  ; compute similarity between curves
-                 [frechet-dist "0.9.0"]
+                 [frechet-dist "0.10.0"]
                  ; create geojson objects
                  [org.clojure/data.json "0.2.6"]
                  ; parse xml lazily

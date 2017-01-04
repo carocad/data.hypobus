@@ -3,6 +3,7 @@
   (:import [java.util Random])
   (:require [hypobus.utils.tool :as tool]
             [hypobus.basics.geometry :as geo]
+            [frechet-dist.protocols :as frepos]
             [clojure.test.check.generators :as gen]))
 
 (def ^:private rand-gen (new Random))
@@ -45,7 +46,7 @@ must span"
   an estimate of the weight = 1/sigma^2"
   [deviation hypopoint]
   (let [new-point (tool/update-vals hypopoint #(+ % (rand-gauss deviation)))
-        p-dist    (geo/distance hypopoint new-point)]
+        p-dist    (frepos/distance hypopoint new-point)]
     (assoc new-point :weight (/ 1 (* p-dist p-dist)))))
 
 (defn add-noise

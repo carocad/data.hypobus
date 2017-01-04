@@ -1,6 +1,7 @@
 (ns hypobus.basic-test
   (:require [clojure.test :as test]
             [frechet-dist.core :as frechet]
+            [frechet-dist.protocols :as frepos]
             [frechet-dist.sampler :as sampler]
             [hypobus.basics.geometry :as geo]
             [hypobus.conjectures.core :as hypo]
@@ -17,7 +18,7 @@
 (def burst-noise 0.01); degrees. standard deviation of the burst noise
 (def num-vandals 1)
 
-(def coordinates (sampler/refine connatra-trace max-dist geo/distance))
+(def coordinates (sampler/refine connatra-trace max-dist frepos/distance))
 (def subcurves (sim/subcurves coordinates num-subcurves min-span))
 (def geo-subcurves (map (fn [s] (map #(zipmap [:lon :lat] %) s))
                         subcurves))
@@ -43,7 +44,7 @@
         burst-noise   0.01; degrees. standard deviation of the burst noise
         num-vandals   1
 
-        coordinates   (sampler/refine connatra-trace max-dist geo/distance)
+        coordinates   (sampler/refine connatra-trace max-dist frepos/distance)
         subcurves     (sim/subcurves coordinates num-subcurves min-span)
         geo-subcurves (map (fn [s] (map #(zipmap [:lon :lat] %) s))
                            subcurves)
