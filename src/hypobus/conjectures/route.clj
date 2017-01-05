@@ -8,7 +8,7 @@
 ; damping factor
 (def EPSILON 1.0)
 ; Maximum value admited to consider two curves similar
-(def MAX-DISIM (/ 50.0 0.6))
+(def MAX-DISIM (/ 50.0 0.6)) ;; 50 meters with 60 % similarity
 
 (defn- arc-length
   "computes the partial arc-length as the sum of the point to point distances
@@ -85,8 +85,8 @@
    (let [{:keys [weight lat lon distrust]} p1
          {w2 :weight, lat2 :lat, lon2 :lon, dt2 :distrust} p2]
      (geo/->HypoPoint
-       (/ (+ (* lat weight) (* lat2 w2)) (+ weight w2))
        (/ (+ (* lon weight) (* lon2 w2)) (+ weight w2))
+       (/ (+ (* lat weight) (* lat2 w2)) (+ weight w2))
        (+ weight w2)
        (/ 1.0 (+ (/ 1.0 distrust) (/ EPSILON dt2))))))
   ([P Q coupling] ; a polygonal line is just a collection of points

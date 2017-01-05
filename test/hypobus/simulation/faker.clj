@@ -38,7 +38,7 @@ must span"
    (subcurves sample amount 0.2))
   ([sample amount percentage]
    (let [length     (count sample)
-         intervals  (rand-intervals length amount (Math/round ^double (* percentage length)))]
+         intervals  (rand-intervals length amount (Math/round (* percentage length)))]
      (map #(apply subvec sample %) intervals))))
 
 (defn- point-noise
@@ -78,14 +78,13 @@ must span"
    :max-lat  (apply max (map second curve))})
 
 (defn rand-2Dcurve
-  "create a random 2 dimensional curve inside the given bounds. The resulting
-  curve is on the form {:lat y :lon x :weight z}"
+  "create a random 2 dimensional hypo curve inside the given bounds"
   [size {:keys [min-long max-long min-lat max-lat]}]
   (let [longitude      (gen/double* {:infinite? false :NaN? false :min min-long :max max-long})
         latitude       (gen/double* {:infinite? false :NaN? false :min min-lat :max max-lat})
         point          (gen/tuple longitude latitude)]
-    (map #(conj % {:weight (rand)})
-         (map #(zipmap [:lon :lat] %) (gen/sample point size)))))
+    (map (fn [[lon lat]] (geo/->HypoPoint lon lat geo/MIN-WEIGHT geo/MAX-DISTRUST))
+         (gen/sample point size))))
 
 (defn bandal-curves
   "create a certain amount of random 2 dimensional curves using the bounding

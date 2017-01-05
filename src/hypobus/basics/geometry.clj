@@ -18,39 +18,37 @@
   "Compute the great-circle distance between two points on Earth given their
   longitude and latitude in RADIANS. The distance is computed in meters
   by default."
-  [^double lat-1 ^double lon-1 ^double lat-2 ^double lon-2]
+  [^double lon-1 ^double lat-1 ^double lon-2 ^double lat-2]
   (let [h  (+ (Math/pow (Math/sin (/ (- lat-2 lat-1) 2)) 2)
               (* (Math/pow (Math/sin (/ (- lon-2 lon-1) 2)) 2)
                  (Math/cos lat-2)
                  (Math/cos lat-1)))]
     (* RADIOUS 2 (Math/asin (Math/sqrt h)))))
 
-; (distance [-86.67 36.12] [-118.40 33.94])
-;=> 2887.2599506071106
+;; (frepos/distance [-86.67 36.12] [-118.40 33.94])
+;=> 2887.2599506071106 km
 ; distance between paris and san francisco
-; (* (distance [2.33 48.87] [-122.4 37.8]) (/ 3440.069 6372))
+; (* (frepos/distance [2.33 48.87] [-122.4 37.8]) (/ 3440.069 6372))
 ; => 4831.502535634215 nauticals miles
 
-(defrecord HypoPoint [^double lat
-                      ^double lon
+(defrecord HypoPoint [^double lon
+                      ^double lat
                       ^double weight
                       ^double distrust])
 
 (extend-protocol frepos/Distance
   HypoPoint ;; point as HypoPoint record
   (frepos/distance [p1 p2]
-    (haversine (Math/toRadians (:lat p1)) (Math/toRadians (:lon p1))
-               (Math/toRadians (:lat p2)) (Math/toRadians (:lon p2))))
+    (haversine (Math/toRadians (:lon p1)) (Math/toRadians (:lat p1))
+               (Math/toRadians (:lon p2)) (Math/toRadians (:lat p2))))
   clojure.lang.IPersistentMap ;; point as hash-map
   (frepos/distance [p1 p2]
-    (haversine (Math/toRadians (:lat p1)) (Math/toRadians (:lon p1))
-               (Math/toRadians (:lat p2)) (Math/toRadians (:lon p2))))
+    (haversine (Math/toRadians (:lon p1)) (Math/toRadians (:lat p1))
+               (Math/toRadians (:lon p2)) (Math/toRadians (:lat p2))))
   clojure.lang.Sequential ;; point as a lat,lon tuple
-  (frepos/distance [[lat lon] [lat2 lon2]]
-    (haversine (Math/toRadians lat)  (Math/toRadians lon)
-               (Math/toRadians lat2) (Math/toRadians lon2))))
-;; NOTE: for sequences we should use (frechet/partial-distance coll coll2)
-
+  (frepos/distance [[lon lat] [lon2 lat2]]
+    (haversine (Math/toRadians lon)  (Math/toRadians lat)
+               (Math/toRadians lon2) (Math/toRadians lat2))))
 
 ;; TODO: do I need to provide an init value for the gaps function?
 (defn gaps

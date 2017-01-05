@@ -7,17 +7,17 @@
 
 ; ================== NOT NAMESPACED YET ====================;
 
-(defn- avg-distrust
+(defn avg-distrust
   "calculate the average distrust in a geo-curve"
   [curve]
   (stats/mean (map :distrust curve)))
 
-(defn- sd-distrust
+(defn sd-distrust
   "calculate the standard deviation of the trust in a geo-curve"
   [curve]
   (stats/sd (map :distrust curve)))
 
-(defn- remove-untrusted
+(defn remove-untrusted
   "takes a sequence of curves and removes those whose average distrust exceeds
   0.9. The removal only happens in any one curve has an average distrust less
   than 0.1, otherwise all curves are returned as they are"
@@ -26,7 +26,7 @@
     (if (< 0.1 min-dt) curves
       (remove #(< 0.9 (avg-distrust %)) curves))))
 
-(defn- remove-outliers
+(defn remove-outliers
   "takes a sequence of curves and remove the points of each curves that are
   more than 3 standard deviations apart from the mean distrust of the curve.
   If the new curve doesn't have more than 3 points, it is also removed"
@@ -67,6 +67,8 @@
         old-hypos               (some-> a-match (set) (remove hypos))]
     (if-not a-match hypos
       (recur (cons (route/fuse c1 c2 (:couple res)) old-hypos)))))
+
+(require '[proto-repl.saved-values])
 
 (defn hypothize
   "compare a trace with the current hypothesis. If any of them matches they are
