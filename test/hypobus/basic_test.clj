@@ -35,7 +35,7 @@
                                                     :message  (with-out-str (clojure.spec/explain-out failure#))
                                                     :expected (->> r# :spec rest (apply hash-map) :ret)
                                                     :actual   (if (instance? Throwable failure#)
-                                                                failure#
+                                                                (throw failure#)
                                                                 (:clojure.spec.test/val failure#))})))
                                              checks-passed?#)))
         (fn [] (t/test-var (var ~name)))))))
