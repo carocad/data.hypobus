@@ -22,7 +22,7 @@
                                       :kind sequential?
                                       :min-count 2
                                       :distinct true)
-                           #(> 0 (arc-length %))))
+                           #(> (arc-length %) 0)))
 
 (s/def ::hypothesis (s/coll-of ::hypo-curve
                                :kind sequential?
