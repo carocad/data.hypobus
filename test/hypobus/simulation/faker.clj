@@ -38,7 +38,7 @@ must span"
    (subcurves sample amount 0.2))
   ([sample amount percentage]
    (let [length     (count sample)
-         intervals  (rand-intervals length amount (Math/round (* percentage length)))]
+         intervals  (rand-intervals length amount (Math/round ^double (* percentage length)))]
      (map #(apply subvec sample %) intervals))))
 
 (defn- point-noise

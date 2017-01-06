@@ -14,7 +14,7 @@
 
 ;; TODO: Do I really need the type hints here even after I put them
 ;;      on the record ?
-(defn- haversine
+(defn haversine
   "Compute the great-circle distance between two points on Earth given their
   longitude and latitude in RADIANS. The distance is computed in meters
   by default."
