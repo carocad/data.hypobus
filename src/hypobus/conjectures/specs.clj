@@ -2,6 +2,10 @@
   (:require [clojure.spec :as s]
             [hypobus.conjectures.core]))
 
+(defn arc-length
+  [curve]
+  (reduce + (subvec (mapv frepos/distance curve (rest curve)) 0 (count curve))))
+
 (s/def ::dist  (s/and number? (comp not neg?)))
 (s/def ::index (s/and integer? (comp not neg?)))
 
@@ -14,10 +18,11 @@
 (s/def ::hypo-point (s/keys :req-un [::lat ::lon ::weight ::distrust]))
 
 ;;(s/def ::geo-curve  (s/coll-of ::geo-point  :kind sequential? :min-count 2))
-(s/def ::hypo-curve (s/coll-of ::hypo-point
-                               :kind sequential?
-                               :min-count 2
-                               :distinct true))
+(s/def ::hypo-curve (s/and (s/coll-of ::hypo-point
+                                      :kind sequential?
+                                      :min-count 2
+                                      :distinct true
+                            #(> 0 (arc-length %)))))
 
 (s/def ::hypothesis (s/coll-of ::hypo-curve
                                :kind sequential?
