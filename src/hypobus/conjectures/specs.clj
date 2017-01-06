@@ -21,8 +21,8 @@
 (s/def ::hypo-curve (s/and (s/coll-of ::hypo-point
                                       :kind sequential?
                                       :min-count 2
-                                      :distinct true
-                            #(> 0 (arc-length %)))))
+                                      :distinct true)
+                           #(> 0 (arc-length %))))
 
 (s/def ::hypothesis (s/coll-of ::hypo-curve
                                :kind sequential?
