@@ -4,7 +4,7 @@
 
 (defn arc-length
   [curve]
-  (reduce + (subvec (mapv frepos/distance curve (rest curve)) 0 (count curve))))
+  (reduce + (subvec (mapv frepos/distance curve (rest curve)) 0 (dec (count curve)))))
 
 (s/def ::dist  (s/and number? (comp not neg?)))
 (s/def ::index (s/and integer? (comp not neg?)))
