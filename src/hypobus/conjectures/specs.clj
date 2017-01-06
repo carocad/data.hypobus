@@ -1,6 +1,6 @@
 (ns hypobus.conjectures.specs
   (:require [clojure.spec :as s]
-            [hypobus.conjectures.core]))
+            [frechet-dist.protocols :as frepos]))
 
 (defn arc-length
   [curve]
