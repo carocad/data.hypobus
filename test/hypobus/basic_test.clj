@@ -23,6 +23,7 @@
      `(def ~(vary-meta name assoc :test `(fn []
                                            (let [check-results# (clojure.spec.test/check ~sym-or-syms ~opts)
                                                  checks-passed?# (every? nil? (map :failure check-results#))]
+                                             (println check-results#)
                                              (if checks-passed?#
                                                (t/do-report {:type    :pass
                                                              :message (str "Generative tests pass for "
@@ -39,7 +40,6 @@
                                                                 (:clojure.spec.test/val failure#))})))
                                              checks-passed?#)))
         (fn [] (t/test-var (var ~name)))))))
-
 
 (defspec-test test-haversine   `hypobus.basics.geometry/haversine {:clojure.spec.test.check/opts {:num-tests 50}})
 (defspec-test test-recombine   `hypobus.conjectures.core/recombine {:clojure.spec.test.check/opts {:num-tests 50}})
