@@ -68,8 +68,6 @@
     (if-not a-match hypos
       (recur (cons (route/fuse c1 c2 (:couple res)) old-hypos)))))
 
-(require '[proto-repl.saved-values])
-
 (defn hypothize
   "compare a trace with the current hypothesis. If any of them matches they are
   merged, otherwise returned as they are. In case a merge occurs, the new
