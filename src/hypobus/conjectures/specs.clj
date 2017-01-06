@@ -35,9 +35,7 @@
   :ret ::hypothesis)
 
 (s/fdef hypobus.conjectures.core/conjectures
-  :args (s/alt :traces (s/nilable ::hypothesis)
-               :trace-sets (s/cat :trace-1 ::hypothesis
-                                  :trace-2 ::hypothesis))
+  :args (s/cat :tr1 ::hypothesis :tr2 ::hypothesis)
   :ret ::hypothesis)
 
 (s/fdef hypobus.conjectures.core/recombine
