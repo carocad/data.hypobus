@@ -20,7 +20,7 @@
    `(t/deftest ~name
       (let [check-results#  (clojure.spec.test/check ~sym-or-syms ~opts)]
         (doseq [result# check-results#]
-          (t/is (nil? (:failure result#)) (clojure.spec.test/abbrev-result result#))
+          (t/is (nil? (:failure result#)) (str (clojure.spec.test/abbrev-result result#)))
           (when (nil? (:failure result#))
             (println "[OK] - " (clojure.spec.test/abbrev-result result#))))))))
 
