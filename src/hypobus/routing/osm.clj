@@ -58,8 +58,6 @@
     (into [] (map (fn [ref] (->Edge @last-ref (vreset! last-ref ref) -1 kind)))
           (rest nodes))))
 
-(require '[proto-repl.saved-values])
-
 (defn upnodes
   [graph edge]
   (let [src (get graph (:src-id edge))
